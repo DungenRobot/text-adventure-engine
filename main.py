@@ -6,48 +6,42 @@ def print_help():
     print(" 'push', 'pull', 'take', 'use', 'look', 'go to', 'open', 'close' ")
 
 
-def load_savedata() -> dict:
-    data = {
-        "room" : "1",
-        "inventory" : []
-    }
-
-    test = shelve.open("savedata")
-    
-    test = dict(test)
-
-    print(test)
-
-
-
-    return data
-
-
 def main():
 
-    data = load_savedata()
+    with shelve.open("savedata") as data:
 
-    while True:
-        input_str = input("> ")
-        result = parse(input_str)
+        if data.get("inventory") == None:
+            data["inventory"] = []
+        
+        print(data['inventory'])
 
-        match result.ERROR:
-            case 1:
-                print("I'm not sure what action you're trying to take")
-                continue
-            case 2:
-                print("You can only take one action at a time")
-                continue
-            case 3:
-                print("I'm not sure what object(s) you're trying to [%s]" % result.verb)
-                pass
-            case 0:
-                
+        data['inventory'].append("Knife")
+
+        print(data['inventory'])
+
+        return
+
+        while True:
+            input_str = input("> ")
+            result = parse(input_str)
+
+            match result.ERROR:
+                case 1:
+                    print("I'm not sure what action you're trying to take")
+                    continue
+                case 2:
+                    print("You can only take one action at a time")
+                    continue
+                case 3:
+                    print("I'm not sure what object(s) you're trying to [%s]" % result.verb)
+                    pass
+                case 0:
+                    
 
 
-                pass
+                    pass
 
-        if result.ERROR: print(result)
+            if result.ERROR: print(result)
 
 
 
