@@ -33,17 +33,16 @@ def parse(sentence: str, scene_nouns: list = ["shed", "hairpin", "unknown", "cel
             verbs_in_sentence.append(word)
         else:
             potential_nouns.append(word)
-
-    if len(verbs) == 0:
+    
+    if len(verbs_in_sentence) == 0:
         return {"ERROR" : 1, "verb" : verbs_in_sentence[0]}
-    if len(verbs) > 1:
+    if len(verbs_in_sentence) > 1:
         return {"ERROR" : 2, "verb" : verbs_in_sentence}
     
     verb = verbs_in_sentence[0]
     
     for key in verbs:
         if verb in verbs[key]:
-            print(verb, key)
             verb = key
     
     objects = []
