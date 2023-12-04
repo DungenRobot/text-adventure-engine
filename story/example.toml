@@ -1,0 +1,35 @@
+#what room you start in
+default = "start"
+#whether the description plays automatically. defaults to false
+desc_auto = false
+
+
+#alias -> room_1.state_default
+[room_start]
+
+#default value
+can_go_back = true
+#required for all rooms
+name = "A dank and musty room. Cobwebs hang in dark corners"
+#required for all rooms. Gives extra information to the player when they look around.
+desc = "You see a dresser at the opposite side of the room. There is a door to the left"
+
+navi_left = "closet"
+navi_closet = "closet"
+
+#an alternate state 
+[room_1.state_2]
+#alternate room states only override room defaults.
+desc = "You see a dresser at the opposite side of the room. There is a closet on the left"
+
+
+[room_1.item_bookshelf]
+
+alias = ["dresser", "armoire", "chest"]
+
+
+
+
+[room_closet]
+name = "A walk-in closet."
+desc = ""
