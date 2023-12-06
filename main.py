@@ -4,6 +4,7 @@ import tomllib as toml
 import os
 import sys
 
+
 def get_input(s):
 
     i = input(s)
@@ -13,16 +14,19 @@ def get_input(s):
     
     return i
 
+
 def get_story_path():
     #generates a list of folder names in the current directory
     stories = [name.removeprefix("story_") for name in os.listdir("./") if name.startswith("story_") and os.path.isdir("./" + name)]
 
     if len(stories) == 0:
         return "ERROR: Can't find any stories in this directory.\nPlease ensure that all "
+    
+    #only one story so we don't need to prompt the user
     if len(stories) == 1:
-        #only one story so we don't need to prompt the user
         return stories[0]
-
+    
+    #prompts the user to select a story from the directory
     while True:
         print("Please select a story")
         for id, story_name in enumerate(stories): 
@@ -35,11 +39,13 @@ def get_story_path():
         print("Something went wrong. Pease make sure you enter a number between 0 and %s (inclusive)" % (len(stories) - 1))
 
 
+#generates story data from a path to the toml file
 def generate_story(path) -> dict:
     with open("./story_%s/%s.toml" % (path, path), "rb") as f:
         storydata = toml.load(f)
 
     return storydata
+
 
 
 def main():
@@ -65,8 +71,8 @@ def main():
             input_str = get_input("> ")
 
 
-            if input_str.lower() == "help":
-                print_help()
+            if input_str.lower().startswith("help"):
+                print_help(input_str)
                 continue
             if "inventory" in input_str:
                 print_inventory(data["inventory"])
@@ -90,15 +96,15 @@ def main():
                     print(result.get("verb"), result.get("noun")[0])
 
 
-
-def print_help():
-    print("You can use the verbs to interact with the world: ")
+def print_help(input_str: str):
+    print("You can any one of these actions to interact with the world: ")
     print(" 'push', 'pull', 'take', 'use', 'look', 'go to', 'open', 'close' ")
+    print("You can also use the command 'check inventory' to see what items you've collected")
+
 
 def print_inventory(inv):
     for item in inv:
         print(item)
-
 
 
 if __name__ == "__main__":
