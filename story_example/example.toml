@@ -39,7 +39,7 @@ alias = ["hanger"]
 [item_bookshelf]
 can_be_picked_up = false
 name = "A dusty bookshelf with rows and rows of books. One seems to stand out."
-alias = ["bookshelf", "shelf"]
+alias = ["bookshelf", "shelf", "shelves"]
 item_book = true
 
 

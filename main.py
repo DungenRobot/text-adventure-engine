@@ -105,11 +105,11 @@ def main():
                 print_help(input_str)
                 continue
             if "inventory" in input_str:
-                print(savedata["inventory"])
                 print_inventory(savedata["inventory"])
                 continue
             
             nouns = ["around", "it", "back"] + current_room.list_items() + focus.list_items() + list(current_room.navi.keys())
+            print(nouns)
             result : dict = parse(input_str, nouns)
             
             match result["ERROR"]:
@@ -144,7 +144,7 @@ def main():
                         print('You take the %s' % item_name)
                         focus = i
                     else:
-                        print("You can't seem to collect the %s" % item_name)
+                        print("You can't seem to fit the %s in your pockets" % item_name)
 
                 case "go":
                     destination = result.get("noun")[0]
@@ -188,7 +188,7 @@ def main():
                         print("I can't quite tell what you're trying to look at")
                 
                 case _:
-                    print(result.get("verb"))
+                    print("I can't %s that" % result.get("verb"))
 
 
 def print_help(input_str: str):

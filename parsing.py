@@ -8,7 +8,7 @@ verbs = {
     "pull"  : ["pull", "drag", "haul", "yank"],
     "take"  : ["take", "get", "steal", "grab", "nab", "collect", "pick up", "acquire"],
     "use"   : ["use", "open", "combine"],
-    "look"  : ["look", "see", "view", "peek", "stare", "peer", "investigate"],
+    "look"  : ["look", "see", "view", "peek", "stare", "peer", "investigate", "check"],
     "go"    : ["go", "travel", "move"],
     "close" : ["close", "shut"]
 }
