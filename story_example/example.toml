@@ -11,7 +11,7 @@ can_go_back = true
 #required for all rooms
 name = "A dank and musty room. Cobwebs hang in dark corners"
 #required for all rooms. Gives extra information to the player when they look around.
-desc = "You see a dresser at the opposite side of the room. There is a door to the left"
+desc = "You see a bookshelf at the opposite side of the room. There is a closet to the left"
 
 #navigation. 
 #format:        navi_[alias for room] = [name of room]
@@ -39,7 +39,7 @@ alias = ["hanger"]
 [item_bookshelf]
 can_be_picked_up = false
 name = "A dusty bookshelf with rows and rows of books. One seems to stand out."
-alias = ["dresser", "armoire", "chest"]
+alias = ["bookshelf", "shelf"]
 item_book = true
 
 

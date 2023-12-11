@@ -7,7 +7,7 @@ import sys
 
 
 
-def get_input(s):
+def get_input(s) -> str:
     i = input(s)
 
     if i == "exit":
@@ -16,7 +16,14 @@ def get_input(s):
     return i
 
 
-def get_story_path():
+def get_story_path() -> str:
+    """
+    Finds all story folders. If only one is available: automatically load it.
+    If multiple are available: prompt the user to choose one.
+    Returns a string.
+    """
+
+
     #generates a list of folder names in the current directory
     stories = [name.removeprefix("story_") for name in os.listdir("./") if name.startswith("story_") and os.path.isdir("./" + name)]
 
@@ -40,8 +47,10 @@ def get_story_path():
         print("Something went wrong. Pease make sure you enter a number between 0 and %s (inclusive)" % (len(stories) - 1))
 
 
-#generates story data from a path to the toml file
 def generate_story(path) -> dict:
+    """
+    Takes in a story name and opens its toml file: then generates a series of nested objects for the story.
+    """
     storydata = {}
     with open("./story_%s/%s.toml" % (path, path), "rb") as f:
         data = toml.load(f)
@@ -60,7 +69,7 @@ def generate_story(path) -> dict:
 
 
 def main():
-
+    
     path = get_story_path()
 
     if path.startswith("ERROR:"):
@@ -91,17 +100,18 @@ def main():
             savedata["current_room"] = room_name
 
             input_str = get_input("> ")
+
             if input_str.lower().startswith("help"):
                 print_help(input_str)
                 continue
             if "inventory" in input_str:
+                print(savedata["inventory"])
                 print_inventory(savedata["inventory"])
                 continue
             
             nouns = ["around", "it", "back"] + current_room.list_items() + focus.list_items() + list(current_room.navi.keys())
-
             result : dict = parse(input_str, nouns)
-
+            
             match result["ERROR"]:
                 case 1:
                     print("I'm not sure what action you're trying to take")
@@ -119,14 +129,18 @@ def main():
             match result.get("verb"):
                 case "take":
                     item_name = result.get("noun")[0]
-                    i = focus.get_item(item_name)
+                    if item_name == "it":
+                        i = focus
+                        item_name = focus.alias[0]
+                    else:
+                        i = focus.get_item(item_name)
                     if i == None:
                         print("I can't find the item '%s'" % item_name)
                     elif i.can_be_picked_up:
-                        if i in savedata["inventory"]:
+                        if item_name in savedata["inventory"]:
                             print("You already have this item")
                             continue
-                        savedata["inventory"].append(i)
+                        savedata["inventory"] += [item_name]
                         print('You take the %s' % item_name)
                         focus = i
                     else:
@@ -168,6 +182,7 @@ def main():
                         focus = i
                     elif noun in current_room.list_items():
                         i = current_room.get_item(noun)
+                        focus = i
                         print(i.desc)
                     else:
                         print("I can't quite tell what you're trying to look at")
@@ -187,9 +202,9 @@ def print_inventory(inv):
     if len(inv) == 0:
         print("Your inventory is empty")
         return
-    print("You have a(n):", end='')
+    print("You have a(n):", end=' ')
     for item in inv:
-        print(item)
+        print(item, end=" ")
 
 
 if __name__ == "__main__":

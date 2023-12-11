@@ -8,7 +8,7 @@ verbs = {
     "pull"  : ["pull", "drag", "haul", "yank"],
     "take"  : ["take", "get", "steal", "grab", "nab", "collect", "pick up", "acquire"],
     "use"   : ["use", "open", "combine"],
-    "look"  : ["look", "see", "view", "peek", "stare", "peer"],
+    "look"  : ["look", "see", "view", "peek", "stare", "peer", "investigate"],
     "go"    : ["go", "travel", "move"],
     "close" : ["close", "shut"]
 }
@@ -52,11 +52,8 @@ def parse(sentence: str, scene_nouns: list = ["shed", "hairpin", "unknown", "cel
         if word in scene_nouns:
             objects.append(word)
 
-    print(sentence)
-    print(objects)
-
-    # if len(objects) == 0:
-    #     return {'ERROR' : 3, 'verb' : verb}
+    if (len(objects) == 0) and (verb != "look"):
+        return {'ERROR' : 3, 'verb' : verb}
     
     return {'ERROR' : 0, 'verb' : verb, 'noun' : objects}
     
