@@ -109,7 +109,6 @@ def main():
                 continue
             
             nouns = ["around", "it", "back"] + current_room.list_items() + focus.list_items() + list(current_room.navi.keys())
-            print(nouns)
             result : dict = parse(input_str, nouns)
             
             match result["ERROR"]:
@@ -134,13 +133,15 @@ def main():
                         item_name = focus.alias[0]
                     else:
                         i = focus.get_item(item_name)
+                        if i == None:
+                            i = current_room.get_item(item_name)
                     if i == None:
                         print("I can't find the item '%s'" % item_name)
                     elif i.can_be_picked_up:
-                        if item_name in savedata["inventory"]:
+                        if i.alias[0] in savedata["inventory"]:
                             print("You already have this item")
                             continue
-                        savedata["inventory"] += [item_name]
+                        savedata["inventory"] += [i.alias[0]]
                         print('You take the %s' % item_name)
                         focus = i
                     else:
@@ -205,6 +206,7 @@ def print_inventory(inv):
     print("You have a(n):", end=' ')
     for item in inv:
         print(item, end=" ")
+    print('\n')
 
 
 if __name__ == "__main__":
