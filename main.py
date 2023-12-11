@@ -1,12 +1,13 @@
-from parsing import parse
+from parsing import parse, room, item
 import shelve
 import tomllib as toml
 import os
 import sys
 
 
-def get_input(s):
 
+
+def get_input(s):
     i = input(s)
 
     if i == "exit":
@@ -41,8 +42,18 @@ def get_story_path():
 
 #generates story data from a path to the toml file
 def generate_story(path) -> dict:
+    storydata = {}
     with open("./story_%s/%s.toml" % (path, path), "rb") as f:
-        storydata = toml.load(f)
+        data = toml.load(f)
+
+        storydata["default"] = data["default"]
+        storydata["intro"] = data["intro"]
+
+
+        for key in data:
+            if key.startswith("room_"):
+                storydata[key[5:]] = room(data, key)
+
 
     return storydata
 
@@ -59,26 +70,37 @@ def main():
     storydata = generate_story(path)
 
 
-    with shelve.open("story_%s/savedata" % path) as data:
+    with shelve.open("story_%s/savedata" % path) as savedata:
 
-        if data.get("inventory") == None:
-            data["inventory"] = ["Knife"]
+        if savedata.get("inventory") == None:
+            savedata["inventory"] = []
         
-        print(data['inventory'], storydata)
+        room_name = savedata.get("current_room", storydata["default"])
+        current_room: room = storydata[room_name]
+        last_room_name = ""
+        focus = current_room
 
+        if not savedata.get("has_seen_intro", False):
+            savedata["has_seen_intro"] = True
+            print(storydata["intro"])
+        else:
+            print(current_room.name)
 
         while True:
+
+            savedata["current_room"] = room_name
+
             input_str = get_input("> ")
-
-
             if input_str.lower().startswith("help"):
                 print_help(input_str)
                 continue
             if "inventory" in input_str:
-                print_inventory(data["inventory"])
+                print_inventory(savedata["inventory"])
                 continue
+            
+            nouns = ["around", "it", "back"] + current_room.list_items() + focus.list_items() + list(current_room.navi.keys())
 
-            result = parse(input_str)
+            result : dict = parse(input_str, nouns)
 
             match result["ERROR"]:
                 case 1:
@@ -89,20 +111,83 @@ def main():
                     continue
                 case 3:
                     print("I'm not sure what object(s) you're trying to [%s]" % result.get("verb"))
+                    continue
+                case _:
                     pass
-                case 0:
+        
 
+            match result.get("verb"):
+                case "take":
+                    item_name = result.get("noun")[0]
+                    i = focus.get_item(item_name)
+                    if i == None:
+                        print("I can't find the item '%s'" % item_name)
+                    elif i.can_be_picked_up:
+                        if i in savedata["inventory"]:
+                            print("You already have this item")
+                            continue
+                        savedata["inventory"].append(i)
+                        print('You take the %s' % item_name)
+                        focus = i
+                    else:
+                        print("You can't seem to collect the %s" % item_name)
 
-                    print(result.get("verb"), result.get("noun")[0])
+                case "go":
+                    destination = result.get("noun")[0]
+                    if destination == "back":
+                        if last_room_name == "":
+                            print("I'm not sure where you're trying to go")
+                            continue
+                        else:
+                            destination = last_room_name
+                    elif destination not in current_room.navi.keys():
+                        print("I'm not sure where you're trying to go.")
+                        continue
+                    else:
+                        destination = current_room.navi[destination]
+                    last_room_name = room_name
+                    room_name = destination
+                    current_room = storydata[room_name]
+                    focus = current_room
+                    print(current_room.name)
+
+                case "look":
+                    nouns = result.get("noun")
+                    if len(nouns) == 0:
+                        print(focus.desc)
+                        continue
+                    noun = nouns[0]
+                    if noun == "around":
+                        print(current_room.desc)
+                        focus = current_room
+                    elif noun == "it":
+                        print(focus.desc)
+                    elif noun in focus.list_items():
+                        i = focus.get_item(noun)
+                        print(i.desc)
+                        focus = i
+                    elif noun in current_room.list_items():
+                        i = current_room.get_item(noun)
+                        print(i.desc)
+                    else:
+                        print("I can't quite tell what you're trying to look at")
+                
+                case _:
+                    print(result.get("verb"))
 
 
 def print_help(input_str: str):
     print("You can any one of these actions to interact with the world: ")
     print(" 'push', 'pull', 'take', 'use', 'look', 'go to', 'open', 'close' ")
     print("You can also use the command 'check inventory' to see what items you've collected")
+    print("You can use the 'exit' command when you're done playing")
 
 
 def print_inventory(inv):
+    if len(inv) == 0:
+        print("Your inventory is empty")
+        return
+    print("You have a(n):", end='')
     for item in inv:
         print(item)
 

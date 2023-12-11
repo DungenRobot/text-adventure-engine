@@ -1,10 +1,9 @@
 #what room you start in
 default = "start"
-#whether the description plays automatically. defaults to false
-desc_auto = false
+#the text that is displayed the first time the user plays 
+intro = "You awake in a dank and musty room. Cobwebs hang in dark corners and you get the sense you're being watched."
 
-
-#alias -> room_1.state_default
+#definiton of a room (must start with `room_`)
 [room_start]
 
 #default value
@@ -14,22 +13,36 @@ name = "A dank and musty room. Cobwebs hang in dark corners"
 #required for all rooms. Gives extra information to the player when they look around.
 desc = "You see a dresser at the opposite side of the room. There is a door to the left"
 
+#navigation. 
+#format:        navi_[alias for room] = [name of room]
 navi_left = "closet"
+navi_door = "closet"
 navi_closet = "closet"
 
-#an alternate state 
-[room_1.state_2]
-#alternate room states only override room defaults.
-desc = "You see a dresser at the opposite side of the room. There is a closet on the left"
-
-
-[room_1.item_bookshelf]
-
-alias = ["dresser", "armoire", "chest"]
-
-
-
+#defines an item in the room. This item can be interacted with if the user is in this room.
+# can be set to any value, just needs to exist as a key.
+item_bookshelf = true
 
 [room_closet]
 name = "A walk-in closet."
-desc = ""
+desc = "A dim closet containing a single coat hanger"
+item_hanger = true
+
+
+[item_hanger]
+#whether the item can be picked up. Optional argument, defaults to true.
+can_be_picked_up = true
+name = "A thin metal coat hanger"
+alias = ["hanger"]
+
+
+[item_bookshelf]
+can_be_picked_up = false
+name = "A dusty bookshelf with rows and rows of books. One seems to stand out."
+alias = ["dresser", "armoire", "chest"]
+item_book = true
+
+
+[item_book]
+name = 'A red novel titled "Escape From Trenzalore"'
+alias = ["novel", "book"]
